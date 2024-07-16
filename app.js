@@ -2,16 +2,38 @@ const express = require('express');
 
 const morgan = require('morgan');
 
+const mongoose = require('mongoose');
+const blog = require('./models/blog')
+
 const app = express();
 
+const dbURI = 'mongodb+srv://netninja:Gabe5005@node.yvsq3ej.mongodb.net/node-tuts?retryWrites=true&w=majority&appName=NODE';;
+
+mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true })
+    .then((result) => app.listen(3000))
+    .catch((err) => console.log(err));
 
 app.set('view engine', 'ejs');
-
-app.listen(3000);
 
 app.use(express.static('public'));
 
 app.use(morgan('dev'));
+
+app.get('/add-blog', (req, res) => {
+    const blog = new Blog({
+        title: 'new blog',
+        snippet: 'about my new blog',
+        body: 'more about my new blog'
+    });
+
+    blog.save()
+        .then((result) => {
+            res.send(result)
+        })
+        .catch((err) =>{
+            console.log(err);
+        });
+})
 
 app.get('/', (req, res) =>{
     const blogs = [
